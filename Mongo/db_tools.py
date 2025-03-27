@@ -17,15 +17,21 @@ class MongoDB():
     def get_cols(self):
         print(self.db.list_collection_names())
 
+    def get_col_name(self):
+        return self.coll.name 
+    # 切换集合
+    def change_col(self,coll):
+        self.coll = self.db[coll]
+
     # 插入一条记录
-    def insert_one(self,dict):
+    def add_one(self,dict):
         ans = self.coll.insert_one(dict)
         if ans.inserted_id != None:
             return True
         return False
     
     # 插入多条记录
-    def insert_many(self,dict_list):
+    def add_many(self,dict_list):
         ans = self.coll.insert_many(dict_list)
         if len(ans.inserted_ids) > 0:
             return True
@@ -34,7 +40,7 @@ class MongoDB():
     # 查询所有数据 return:list
     def find_all(self):
         ans = []
-        for data in self.coll.find({},{'_id':0,'title':1,'year':1}):
+        for data in self.coll.find({}):
             ans.append(data)
         return ans
     
@@ -43,4 +49,11 @@ class MongoDB():
         ans = []
         for data in self.coll.find(query_dict):
             ans.append(data)
-        return ans
+        return ans[0]
+    
+if __name__ == '__main__':
+    mg = MongoDB()
+    mg.change_col('user')
+    print(mg.find_by_query({
+    "account": "root"
+}))
