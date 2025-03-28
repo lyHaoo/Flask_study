@@ -3,6 +3,7 @@ from Mongo.db_tools import MongoDB
 # 用于生成密码散列值和验证面膜
 from werkzeug.security import generate_password_hash,check_password_hash
 import json
+import pymongo
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
@@ -42,9 +43,21 @@ def regist():
     type = request.form.get('type')
     mg.change_col("user")
     insert_dict = {'account':account,'password':pwd_hash,"type":type}
-    if mg.add_one(insert_dict):
-        return "regist success."
-    return "regist falied"
+    try:
+        mg.add_one(insert_dict)
+        res = {
+            "message":"regist success.",
+            "account":account,
+            "password":pwd,
+            "password_hash":pwd_hash
+        }
+        return res
+    except Exception as e:
+        res ={
+            "message":"regist failed.",
+            "error":str(e)
+        }
+        return res
 
 @app.route("/check_pwd",methods=['GET'])
 def check_pwd():
